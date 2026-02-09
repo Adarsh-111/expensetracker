@@ -7,7 +7,6 @@ function App() {
   const [category, setCategory] = useState("Food");
   const [transactions, setTransactions] = useState([]);
 
-  /* ---------- LOAD FROM localStorage ---------- */
   useEffect(() => {
     const savedBalance = localStorage.getItem("balance");
     const savedTransactions = localStorage.getItem("transactions");
@@ -16,23 +15,19 @@ function App() {
     if (savedTransactions) setTransactions(JSON.parse(savedTransactions));
   }, []);
 
-  /* ---------- SAVE TO localStorage ---------- */
   useEffect(() => {
     localStorage.setItem("balance", balance);
     localStorage.setItem("transactions", JSON.stringify(transactions));
   }, [balance, transactions]);
 
-  /* ---------- ADD INCOME ---------- */
   const handleAddIncome = () => {
     if (!income) return;
     setBalance(balance + Number(income));
     setIncome("");
   };
 
-  /* ---------- ADD EXPENSE ---------- */
   const handleAddExpense = (e) => {
     e.preventDefault();
-
     if (!expenseAmount) return;
 
     const newTransaction = {
@@ -47,23 +42,19 @@ function App() {
 
   return (
     <div>
-      {/* HEADER */}
       <h1>Expense Tracker</h1>
 
-      {/* WALLET + EXPENSES (REQUIRED TEXT) */}
       <h2>Expenses</h2>
       <p>Wallet Balance: ₹{balance}</p>
 
-      {/* ADD INCOME */}
       <input
         type="number"
         placeholder="Income Amount"
         value={income}
         onChange={(e) => setIncome(e.target.value)}
       />
-      <button onClick={handleAddIncome}>Add Income</button>
+      <button onClick={handleAddIncome}>+ Add Income</button>
 
-      {/* ADD EXPENSE FORM */}
       <form onSubmit={handleAddExpense}>
         <input
           type="number"
@@ -82,12 +73,10 @@ function App() {
           <option value="Entertainment">Entertainment</option>
         </select>
 
-        <button type="submit">Add Expense</button>
+        <button type="submit">+ Add Expense</button>
       </form>
 
-      {/* TRANSACTIONS (REQUIRED TEXT) */}
       <h2>Transactions</h2>
-
       <ul>
         {transactions.map((txn, index) => (
           <li key={index}>
