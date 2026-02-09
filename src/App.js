@@ -3,7 +3,6 @@ import "./App.css";
 
 function App() {
   const [balance, setBalance] = useState(5000);
-  const [expenses, setExpenses] = useState(0);
 
   const [showBalanceModal, setShowBalanceModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
@@ -15,28 +14,32 @@ function App() {
 
   const [transactions, setTransactions] = useState([]);
 
-  // Load from localStorage
+  // ✅ expenses is DERIVED (not state)
+  const expenses = transactions.reduce((sum, t) => sum + t.price, 0);
+
+  /* ---------- LOAD FROM localStorage ---------- */
   useEffect(() => {
     const b = localStorage.getItem("balance");
-    const e = localStorage.getItem("expenses");
     const t = localStorage.getItem("transactions");
 
     if (b) setBalance(Number(b));
-    if (e) setExpenses(Number(e));
-    if (t) {
-  const parsed = JSON.parse(t);
-  setTransactions(Array.isArray(parsed) ? parsed : []);
-}
 
+    if (t) {
+      const parsed = JSON.parse(t);
+      setTransactions(Array.isArray(parsed) ? parsed : []);
+    }
   }, []);
 
-  // Save to localStorage
+  /* ---------- SAVE TO localStorage ---------- */
   useEffect(() => {
     localStorage.setItem("balance", balance);
-    localStorage.setItem("expenses", expenses);
     localStorage.setItem("transactions", JSON.stringify(transactions));
-  }, [balance, expenses, transactions]);
 
+    // 🔑 Cypress expects expenses to be an ARRAY
+    localStorage.setItem("expenses", JSON.stringify(transactions));
+  }, [balance, transactions]);
+
+  /* ---------- ADD BALANCE ---------- */
   const addBalance = () => {
     if (!income) return;
     setBalance(balance + Number(income));
@@ -44,6 +47,7 @@ function App() {
     setShowBalanceModal(false);
   };
 
+  /* ---------- ADD EXPENSE ---------- */
   const addExpense = () => {
     if (!title || !price) return;
 
@@ -54,7 +58,6 @@ function App() {
     };
 
     setTransactions([txn, ...transactions]);
-    setExpenses(expenses + Number(price));
     setBalance(balance - Number(price));
 
     setTitle("");
@@ -172,57 +175,51 @@ function App() {
             <h3>Add Expenses</h3>
 
             <form
-  onSubmit={(e) => {
-    e.preventDefault();
-    addExpense();
-  }}
->
-  <input
-    type="text"
-    name="title"
-    placeholder="Title"
-    value={title}
-    onChange={(e) => setTitle(e.target.value)}
-    required
-  />
+              onSubmit={(e) => {
+                e.preventDefault();
+                addExpense();
+              }}
+            >
+              <input
+                type="text"
+                name="title"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
 
-  <input
-    type="number"
-    name="price"
-    placeholder="Price"
-    value={price}
-    onChange={(e) => setPrice(e.target.value)}
-    required
-  />
+              <input
+                type="number"
+                name="price"
+                placeholder="Price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
 
-  {/* 👇 THIS IS THE MISSING FIELD */}
-  <input
-    type="date"
-    name="date"
-    required
-  />
+              <input type="date" name="date" required />
 
-  <select
-    name="category"
-    value={category}
-    onChange={(e) => setCategory(e.target.value)}
-  >
-    <option value="Food">Food</option>
-    <option value="Travel">Travel</option>
-    <option value="Entertainment">Entertainment</option>
-  </select>
+              <select
+                name="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Entertainment">Entertainment</option>
+              </select>
 
-  <div className="modal-actions">
-    <button type="submit">Add Expense</button>
-    <button
-      type="button"
-      onClick={() => setShowExpenseModal(false)}
-    >
-      Cancel
-    </button>
-  </div>
-</form>
-
+              <div className="modal-actions">
+                <button type="submit">Add Expense</button>
+                <button
+                  type="button"
+                  onClick={() => setShowExpenseModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
