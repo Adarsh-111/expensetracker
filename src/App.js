@@ -168,49 +168,57 @@ function App() {
             <h3>Add Expenses</h3>
 
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                addExpense();
-              }}
-            >
-              <input
-                type="text"
-                name="title"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
+  onSubmit={(e) => {
+    e.preventDefault();
+    addExpense();
+  }}
+>
+  <input
+    type="text"
+    name="title"
+    placeholder="Title"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    required
+  />
 
-              <input
-                type="number"
-                name="price"
-                placeholder="Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-              />
+  <input
+    type="number"
+    name="price"
+    placeholder="Price"
+    value={price}
+    onChange={(e) => setPrice(e.target.value)}
+    required
+  />
 
-              <select
-                name="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option value="Food">Food</option>
-                <option value="Travel">Travel</option>
-                <option value="Entertainment">Entertainment</option>
-              </select>
+  {/* 👇 THIS IS THE MISSING FIELD */}
+  <input
+    type="date"
+    name="date"
+    required
+  />
 
-              <div className="modal-actions">
-                <button type="submit">Add Expense</button>
-                <button
-                  type="button"
-                  onClick={() => setShowExpenseModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+  <select
+    name="category"
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+  >
+    <option value="Food">Food</option>
+    <option value="Travel">Travel</option>
+    <option value="Entertainment">Entertainment</option>
+  </select>
+
+  <div className="modal-actions">
+    <button type="submit">Add Expense</button>
+    <button
+      type="button"
+      onClick={() => setShowExpenseModal(false)}
+    >
+      Cancel
+    </button>
+  </div>
+</form>
+
           </div>
         </div>
       )}
