@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 function App() {
   const [balance, setBalance] = useState(0);
   const [income, setIncome] = useState("");
+  const [title, setTitle] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
   const [category, setCategory] = useState("Food");
   const [transactions, setTransactions] = useState([]);
 
+  // Load from localStorage
   useEffect(() => {
     const savedBalance = localStorage.getItem("balance");
     const savedTransactions = localStorage.getItem("transactions");
@@ -15,6 +17,7 @@ function App() {
     if (savedTransactions) setTransactions(JSON.parse(savedTransactions));
   }, []);
 
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem("balance", balance);
     localStorage.setItem("transactions", JSON.stringify(transactions));
@@ -28,15 +31,18 @@ function App() {
 
   const handleAddExpense = (e) => {
     e.preventDefault();
-    if (!expenseAmount) return;
+    if (!title || !expenseAmount) return;
 
     const newTransaction = {
+      title,
       amount: Number(expenseAmount),
       category,
     };
 
     setTransactions([...transactions, newTransaction]);
     setBalance(balance - Number(expenseAmount));
+
+    setTitle("");
     setExpenseAmount("");
   };
 
@@ -47,6 +53,7 @@ function App() {
       <h2>Expenses</h2>
       <p>Wallet Balance: ₹{balance}</p>
 
+      {/* INCOME */}
       <input
         type="number"
         placeholder="Income Amount"
@@ -54,14 +61,25 @@ function App() {
         onChange={(e) => setIncome(e.target.value)}
       />
       <button onClick={handleAddIncome}>+ Add Income</button>
+      <button onClick={handleAddIncome}>Add Balance</button>
 
+      {/* EXPENSE FORM */}
       <form onSubmit={handleAddExpense}>
+        <input
+          type="text"
+          name="title"
+          placeholder="Expense Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+
         <input
           type="number"
           placeholder="Expense Amount"
           value={expenseAmount}
-          required
           onChange={(e) => setExpenseAmount(e.target.value)}
+          required
         />
 
         <select
@@ -80,7 +98,7 @@ function App() {
       <ul>
         {transactions.map((txn, index) => (
           <li key={index}>
-            {txn.category} - ₹{txn.amount}
+            {txn.title} - {txn.category} - ₹{txn.amount}
           </li>
         ))}
       </ul>
