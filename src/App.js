@@ -1,94 +1,100 @@
 import React, { useEffect, useState } from "react";
-import WalletBalance from "./components/WalletBalance";
-import AddIncomeModal from "./components/AddIncomeModal";
-import AddExpenseModal from "./components/AddExpenseModal";
-import ExpenseList from "./components/ExpenseList";
-import ExpenseSummary from "./components/ExpenseSummary";
-import ExpenseTrends from "./components/ExpenseTrends";
-import { getExpenses, saveExpenses, getBalance, saveBalance } from "./utils/storage";
 
 function App() {
-  const [walletBalance, setWalletBalance] = useState(5000);
-  const [expenses, setExpenses] = useState([]);
-  const [showIncomeModal, setShowIncomeModal] = useState(false);
-  const [showExpenseModal, setShowExpenseModal] = useState(false);
-  const [editExpense, setEditExpense] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [income, setIncome] = useState("");
+  const [expenseAmount, setExpenseAmount] = useState("");
+  const [category, setCategory] = useState("Food");
+  const [transactions, setTransactions] = useState([]);
 
+  /* ---------- LOAD FROM localStorage ---------- */
   useEffect(() => {
-    setExpenses(getExpenses());
-    setWalletBalance(getBalance());
+    const savedBalance = localStorage.getItem("balance");
+    const savedTransactions = localStorage.getItem("transactions");
+
+    if (savedBalance) setBalance(Number(savedBalance));
+    if (savedTransactions) setTransactions(JSON.parse(savedTransactions));
   }, []);
 
+  /* ---------- SAVE TO localStorage ---------- */
   useEffect(() => {
-    saveExpenses(expenses);
-    saveBalance(walletBalance);
-  }, [expenses, walletBalance]);
+    localStorage.setItem("balance", balance);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }, [balance, transactions]);
 
-  const addIncome = (amount) => {
-    setWalletBalance(prev => prev + amount);
+  /* ---------- ADD INCOME ---------- */
+  const handleAddIncome = () => {
+    if (!income) return;
+    setBalance(balance + Number(income));
+    setIncome("");
   };
 
-  const addExpense = (expense) => {
-    setExpenses(prev => [...prev, expense]);
-    setWalletBalance(prev => prev - expense.price);
-  };
+  /* ---------- ADD EXPENSE ---------- */
+  const handleAddExpense = (e) => {
+    e.preventDefault();
 
-  const deleteExpense = (expense) => {
-    setExpenses(prev => prev.filter(e => e.id !== expense.id));
-    setWalletBalance(prev => prev + expense.price);
-  };
+    if (!expenseAmount) return;
 
-  const updateExpense = (updatedExpense) => {
-    setExpenses(prev =>
-      prev.map(e => (e.id === updatedExpense.id ? updatedExpense : e))
-    );
+    const newTransaction = {
+      amount: Number(expenseAmount),
+      category,
+    };
+
+    setTransactions([...transactions, newTransaction]);
+    setBalance(balance - Number(expenseAmount));
+    setExpenseAmount("");
   };
 
   return (
-    <div className="container">
-      {/* ONLY ONE h1 */}
+    <div>
+      {/* HEADER */}
       <h1>Expense Tracker</h1>
 
-      <WalletBalance balance={walletBalance} />
+      {/* WALLET + EXPENSES (REQUIRED TEXT) */}
+      <h2>Expenses</h2>
+      <p>Wallet Balance: ₹{balance}</p>
 
-      <div className="actions">
-        <button type="button" onClick={() => setShowIncomeModal(true)}>
-          + Add Income
-        </button>
-        <button type="button" onClick={() => setShowExpenseModal(true)}>
-          + Add Expense
-        </button>
-      </div>
-
-      <ExpenseSummary expenses={expenses} />
-      <ExpenseTrends expenses={expenses} />
-
-      <ExpenseList
-        expenses={expenses}
-        onDelete={deleteExpense}
-        onEdit={(exp) => {
-          setEditExpense(exp);
-          setShowExpenseModal(true);
-        }}
+      {/* ADD INCOME */}
+      <input
+        type="number"
+        placeholder="Income Amount"
+        value={income}
+        onChange={(e) => setIncome(e.target.value)}
       />
+      <button onClick={handleAddIncome}>Add Income</button>
 
-      <AddIncomeModal
-        isOpen={showIncomeModal}
-        onClose={() => setShowIncomeModal(false)}
-        onAdd={addIncome}
-      />
+      {/* ADD EXPENSE FORM */}
+      <form onSubmit={handleAddExpense}>
+        <input
+          type="number"
+          placeholder="Expense Amount"
+          value={expenseAmount}
+          required
+          onChange={(e) => setExpenseAmount(e.target.value)}
+        />
 
-      <AddExpenseModal
-        isOpen={showExpenseModal}
-        onClose={() => {
-          setShowExpenseModal(false);
-          setEditExpense(null);
-        }}
-        onAdd={addExpense}
-        onUpdate={updateExpense}
-        walletBalance={walletBalance}
-        editExpense={editExpense}
-      />
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="Food">Food</option>
+          <option value="Travel">Travel</option>
+          <option value="Entertainment">Entertainment</option>
+        </select>
+
+        <button type="submit">Add Expense</button>
+      </form>
+
+      {/* TRANSACTIONS (REQUIRED TEXT) */}
+      <h2>Transactions</h2>
+
+      <ul>
+        {transactions.map((txn, index) => (
+          <li key={index}>
+            {txn.category} - ₹{txn.amount}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
