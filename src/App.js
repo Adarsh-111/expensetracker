@@ -18,8 +18,8 @@ function App() {
   // Load from localStorage
   useEffect(() => {
     const b = localStorage.getItem("balance");
-    const t = localStorage.getItem("transactions");
     const e = localStorage.getItem("expenses");
+    const t = localStorage.getItem("transactions");
 
     if (b) setBalance(Number(b));
     if (e) setExpenses(Number(e));
@@ -62,18 +62,33 @@ function App() {
     <div className="app">
       <h1 className="header">Expense Tracker</h1>
 
+      {/* TOP SECTION */}
       <div className="top-section">
         <div className="cards">
+          {/* WALLET CARD */}
           <div className="card">
-            <p>Wallet Balance: <span className="green">₹{balance}</span></p>
-            <button className="green-btn" onClick={() => setShowBalanceModal(true)}>
+            <p>
+              Wallet Balance: <span className="green">₹{balance}</span>
+            </p>
+            <button
+              type="button"
+              className="green-btn"
+              onClick={() => setShowBalanceModal(true)}
+            >
               + Add Income
             </button>
           </div>
 
+          {/* EXPENSE CARD */}
           <div className="card">
-            <p>Expenses: <span className="orange">₹{expenses}</span></p>
-            <button className="red-btn" onClick={() => setShowExpenseModal(true)}>
+            <p>
+              Expenses: <span className="orange">₹{expenses}</span>
+            </p>
+            <button
+              type="button"
+              className="red-btn"
+              onClick={() => setShowExpenseModal(true)}
+            >
               + Add Expense
             </button>
           </div>
@@ -89,6 +104,7 @@ function App() {
         </div>
       </div>
 
+      {/* BOTTOM SECTION */}
       <div className="bottom-section">
         <div className="transactions">
           <h2>Recent Transactions</h2>
@@ -117,16 +133,30 @@ function App() {
         <div className="modal">
           <div className="modal-box">
             <h3>Add Balance</h3>
-            <input
-              type="number"
-              placeholder="Income Amount"
-              value={income}
-              onChange={(e) => setIncome(e.target.value)}
-            />
-            <div className="modal-actions">
-              <button onClick={addBalance}>Add Balance</button>
-              <button onClick={() => setShowBalanceModal(false)}>Cancel</button>
-            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addBalance();
+              }}
+            >
+              <input
+                type="number"
+                placeholder="Income Amount"
+                value={income}
+                onChange={(e) => setIncome(e.target.value)}
+              />
+
+              <div className="modal-actions">
+                <button type="submit">Add Balance</button>
+                <button
+                  type="button"
+                  onClick={() => setShowBalanceModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -137,32 +167,50 @@ function App() {
           <div className="modal-box">
             <h3>Add Expenses</h3>
 
-            <input
-              type="text"
-              name="title"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addExpense();
+              }}
+            >
+              <input
+                type="text"
+                name="title"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
 
-            <input
-              type="number"
-              name="price"
-              placeholder="Price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
+              <input
+                type="number"
+                name="price"
+                placeholder="Price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
 
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option>Food</option>
-              <option>Entertainment</option>
-              <option>Travel</option>
-            </select>
+              <select
+                name="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Entertainment">Entertainment</option>
+              </select>
 
-            <div className="modal-actions">
-              <button onClick={addExpense}>Add Expense</button>
-              <button onClick={() => setShowExpenseModal(false)}>Cancel</button>
-            </div>
+              <div className="modal-actions">
+                <button type="submit">Add Expense</button>
+                <button
+                  type="button"
+                  onClick={() => setShowExpenseModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
