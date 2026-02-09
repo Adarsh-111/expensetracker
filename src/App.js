@@ -23,7 +23,11 @@ function App() {
 
     if (b) setBalance(Number(b));
     if (e) setExpenses(Number(e));
-    if (t) setTransactions(JSON.parse(t));
+    if (t) {
+  const parsed = JSON.parse(t);
+  setTransactions(Array.isArray(parsed) ? parsed : []);
+}
+
   }, []);
 
   // Save to localStorage
